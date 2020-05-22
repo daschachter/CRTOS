@@ -23,7 +23,7 @@
 static struct pt pt_getserbuff;
 static struct pt pt_putserbuff;
 
-
+// Writes a 16-bit integer via Serial
 void write_int_to_transmit(int16_t var) {
 	int counter = 4;
 	PT_send_buffer[counter + 1] = '\r';
@@ -35,6 +35,8 @@ void write_int_to_transmit(int16_t var) {
 	}
 }
 
+// ADC interrupt handler. Reads ADC value and transmits via Serial
+// Currenly not used (ADC interrupts are not enabled)
 void ADC_Handler(void) {
 	if(ADC->INTFLAG.bit.RESRDY) {
 		PORT->Group[0].OUTTGL.reg |= PORT_PA17;
@@ -58,25 +60,27 @@ int main(void) {
 	
 	//NVIC_EnableIRQ(SERCOM0_IRQn);
 	
+	// Set up protothreads
 	PT_setup();
 	PT_INIT(&pt_getserbuff);
 	PT_INIT(&pt_putserbuff);
 	
 	//NVIC_EnableIRQ(ADC_IRQn);
 	adc_init();
-	
+
+	// Read ADC (without using interrupts)
 	while(1) {
 		if(!PT_SCHEDULE(PT_get_serial_buffer(&pt_getserbuff))) {
 			//ADC->SWTRIG.bit.START = 1;
 			//while(ADC->STATUS.bit.SYNCBUSY); // wait for synchronization
 			
 			
-			while(ADC->INTFLAG.bit.RESRDY == 0);
-			PORT->Group[0].OUTTGL.reg |= PORT_PA17;
-			int16_t result = ADC->RESULT.reg;
+			while(ADC->INTFLAG.bit.RESRDY == 0); // wait for ADC result to be ready
+			PORT->Group[0].OUTTGL.reg |= PORT_PA17; // toggle LED
+			int16_t result = ADC->RESULT.reg; // store ADC result
 			while(ADC->STATUS.bit.SYNCBUSY); // wait for synchronization
 					
-			write_int_to_transmit(result);
+			write_int_to_transmit(result); // write ADC result via serial
 			
 			while(PT_put_serial_buffer(&pt_putserbuff) == PT_YIELDED);
 		}

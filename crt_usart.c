@@ -10,6 +10,8 @@
 *  - Getting Started with the SAM D21 Xplained Pro without ASF: https://www.digikey.com/eewiki/display/microcontroller/Getting+Started+with+the+SAM+D21+Xplained+Pro+without+ASF
 *  - SAM D21 Clock System Configuration: https://microchipdeveloper.com/32arm:samd21-clock-system-configuration
 *  - https://www.avrfreaks.net/forum/no-asf-samd21-sercom3-tutorial-help
+
+* Made significant use of: http://ww1.microchip.com/downloads/en/AppNotes/Atmel-42539-SAMD-SERCOM-USART-Configuration_ApplicationNote_AT11626.pdf
 ******************/
 
 
